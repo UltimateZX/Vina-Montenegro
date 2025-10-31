@@ -1,23 +1,27 @@
 <?php
 
+// Controladores del Admin
+use App\Http\Controllers\Admin\DashboardController; // <-- ¡Añadido!
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\PaymentValidationController;
 use App\Http\Controllers\Admin\ProductCrudController;
-use Illuminate\Support\Facades\Route;
 // Controladores de Breeze
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController; 
+// Controladores de la Tienda
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\PaymentController;
 
 /*
 |--------------------------------------------------------------------------
-| Rutas de la Tienda
+| Rutas de la Tienda (Públicas)
 |--------------------------------------------------------------------------
 */
 
-// La página de inicio ('/') ES nuestro catálogo de productos
 Route::get('/', [ProductController::class, 'index'])->name('home');
 
-// Grupo de rutas para el Carrito
 Route::get('/carrito', [CartController::class, 'index'])->name('cart.index');
 Route::post('/carrito/agregar', [CartController::class, 'add'])->name('cart.add');
 Route::post('/carrito/aumentar', [CartController::class, 'increase'])->name('cart.increase');
@@ -27,7 +31,7 @@ Route::post('/carrito/eliminar', [CartController::class, 'remove'])->name('cart.
 
 /*
 |--------------------------------------------------------------------------
-| Rutas de Autenticación (Breeze)
+| Rutas de Autenticación (Clientes y Admin logueados)
 |--------------------------------------------------------------------------
 */
 
@@ -40,41 +44,46 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Ruta para mostrar el formulario de dirección (checkout)
     Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout.index');
+    Route::post('/checkout', [CartController::class, 'placeOrder'])->name('checkout.placeOrder');
+    
+    Route::get('/pago/{pedido}', [PaymentController::class, 'index'])->name('payment.index');
+    Route::post('/pago/{pedido}', [PaymentController::class, 'storeVoucher'])->name('payment.store');
 });
 
-// Esto carga las rutas de login, registro, logout, etc.
+Route::get('/pago/exito', function() {
+    return view('payment.success');
+})->name('payment.success');
+
 require __DIR__.'/auth.php';
 
 /*
 |--------------------------------------------------------------------------
-| Rutas del Panel de Administrador
+| Rutas del Panel de Administrador (SOLO ADMIN)
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
 
-    // Ruta del Dashboard (ahora usa el layout)
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard'); // <-- Lo crearemos en el Paso 4
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // NUEVO: Rutas del CRUD de Productos
-    // Esto crea automáticamente:
-    // admin.productos.index (GET /admin/productos)
-    // admin.productos.create (GET /admin/productos/crear)
-    // admin.productos.store (POST /admin/productos)
-    // admin.productos.edit (GET /admin/productos/{id}/editar)
-    // admin.productos.update (PUT/PATCH /admin/productos/{id})
-    // admin.productos.destroy (DELETE /admin/productos/{id})
     Route::resource('productos', ProductCrudController::class);
 
-    // Muestra el formulario de dirección
-    Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout.index');
+    // Validación de Pagos
+    Route::get('/pagos', [PaymentValidationController::class, 'index'])->name('pagos.index');
+    Route::get('/pagos/{pedido}', [PaymentValidationController::class, 'show'])->name('pagos.show');
+    Route::post('/pagos/{pedido}/approve', [PaymentValidationController::class, 'approve'])->name('pagos.approve');
+    Route::post('/pagos/{pedido}/reject', [PaymentValidationController::class, 'reject'])->name('pagos.reject');
 
-    // ¡NUEVA RUTA! Recibe los datos del formulario y crea el pedido
-    Route::post('/checkout', [CartController::class, 'placeOrder'])->name('checkout.placeOrder');
+    // Historial de Pedidos
+    Route::get('/pedidos', [OrderController::class, 'index'])->name('pedidos.index');
+    Route::get('/pedidos/{pedido}', [OrderController::class, 'show'])->name('pedidos.show');
+    Route::delete('/pedidos/{pedido}', [OrderController::class, 'destroy'])->name('pedidos.destroy');
+    Route::post('/pedidos/{pedido}/complete', [OrderController::class, 'complete'])->name('pedidos.complete');
 
-    Route::get('/pago/{pedido}', [PaymentController::class, 'index'])->name('payment.index');
-
+    // Gestión de Usuarios
+    Route::get('/usuarios', [UserController::class, 'index'])->name('usuarios.index');
+    Route::get('/usuarios/{usuario}', [UserController::class, 'show'])->name('usuarios.show');
+    Route::post('/usuarios/{usuario}/toggle-role', [UserController::class, 'toggleRole'])->name('usuarios.toggleRole');
+    Route::delete('/usuarios/{usuario}', [UserController::class, 'destroy'])->name('usuarios.destroy');
+    
 });

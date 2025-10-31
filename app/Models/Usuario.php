@@ -38,4 +38,12 @@ class Usuario extends Authenticatable // <-- Debe extender 'Authenticatable'
         'password', // <-- ¡Corregido!
         'remember_token',
     ];
+
+    /**
+ * Un Usuario puede tener muchos Pedidos.
+ */
+    public function pedidos()
+{
+    return $this->hasMany(Pedido::class);
+}
 }

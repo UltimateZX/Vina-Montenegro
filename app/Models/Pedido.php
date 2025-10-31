@@ -21,4 +21,20 @@ class Pedido extends Model
         'estado',
         'fecha_pedido',
     ];
+
+    public function usuario()
+{
+    return $this->belongsTo(Usuario::class);
+}
+
+    // Un Pedido tiene un Pago
+    public function pago()
+{
+    return $this->hasOne(Pago::class);
+}
+
+public function detalles_pedido()
+{
+    return $this->hasMany(DetallePedido::class);
+}
 }

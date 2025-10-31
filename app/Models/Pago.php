@@ -5,21 +5,23 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class DetallePedido extends Model
+class Pago extends Model
 {
     use HasFactory;
-    protected $table = 'detalles_pedido';
+    protected $table = 'pagos';
     public $timestamps = false; // No usamos created_at/updated_at
 
+    // Campos que podemos llenar
     protected $fillable = [
         'pedido_id',
-        'producto_id',
-        'cantidad',
-        'precio_unitario',
+        'metodo_pago',
+        'url_voucher',
+        'fecha_carga',
+        'estado_validacion',
     ];
 
-    public function producto()
+    public function pedido()
 {
-    return $this->belongsTo(Producto::class);
+    return $this->belongsTo(Pedido::class);
 }
 }

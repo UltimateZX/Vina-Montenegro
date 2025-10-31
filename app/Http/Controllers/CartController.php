@@ -8,6 +8,7 @@ use App\Models\Pedido;
 use App\Models\DetallePedido;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Producto;
 
 class CartController extends Controller
 {
@@ -170,7 +171,7 @@ public function placeOrder(Request $request)
         $total += $item['precio'] * $item['quantity'];
     }
 
-    // 3. Usamos una Transacción (¡Importante!)
+    // 3. Usamos una Transacción 
     // Esto asegura que si algo falla, no se crea nada a medias.
     try {
         DB::beginTransaction();
@@ -195,7 +196,12 @@ public function placeOrder(Request $request)
                 'precio_unitario' => $item['precio'],
             ]);
             // Aquí también deberíamos descontar el stock del producto
-            // (Lo haremos después)
+            $producto = Producto::find($id);
+                if ($producto) {
+                $producto->stock -= $item['quantity']; // Restamos la cantidad
+                $producto->save(); // Guardamos el nuevo stock
+            }
+
         }
 
         // 6. Si todo salió bien, vaciamos el carrito

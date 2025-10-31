@@ -46,7 +46,7 @@
     <h2>Información de Envío</h2>
     <p>Por favor, completa dónde te enviaremos tu pedido.</p>
 
-    <form action="#" method="POST">
+    <form action="{{ route('checkout.placeOrder') }}" method="POST">
         @csrf
 
         <div class="form-group">

@@ -27,7 +27,7 @@
         padding: 0;
         color: #888;
     }
-    .mini-cart-items { flex-grow: 1; overflow-y: auto; }
+    .mini-cart-items { flex-grow: 1; overflow-y: auto; max-height: calc(100vh - 250px); }
     .mini-cart-item { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; }
     .mini-cart-item img { width: 60px; height: 60px; object-fit: cover; border-radius: 4px; }
     .mini-cart-item .info { flex-grow: 1; }

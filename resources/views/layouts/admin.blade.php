@@ -51,7 +51,11 @@
                 
                 <li><a href="{{ route('admin.productos.index') }}">Productos</a></li>
                 
-                <li><a href="#">Validar Pagos</a></li>
+                <li><a href="{{ route('admin.pagos.index') }}">Validar Pagos</a></li>
+
+                <li><a href="{{ route('admin.pedidos.index') }}">Historial de Pedidos</a></li>
+
+                <li><a href="{{ route('admin.usuarios.index') }}">Gestionar Usuarios</a></li>
                 
                 <li class="store-link">
                     <a href="{{ route('home') }}">
