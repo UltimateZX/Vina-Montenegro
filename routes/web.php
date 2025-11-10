@@ -67,6 +67,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::resource('productos', ProductCrudController::class);
+    Route::post('/productos/{producto}/activate', [ProductCrudController::class, 'activate'])->name('productos.activate');
 
     // Validación de Pagos
     Route::get('/pagos', [PaymentValidationController::class, 'index'])->name('pagos.index');

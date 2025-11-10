@@ -3,30 +3,34 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Producto;
+use App\Models\Producto; // <-- Solo usamos el Modelo
 use App\Models\Categoria;
-use App\Repositories\ProductRepository;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage; // ¡Importante para borrar imágenes!
-
+use Illuminate\Support\Facades\Storage;
 
 class ProductCrudController extends Controller
 {
-    protected $productRepository;
+    // ¡HEMOS BORRADO EL REPOSITORIO DE AQUÍ!
+    // Ya no hay __construct()
 
-    public function __construct(ProductRepository $repository)
-    {
-        $this->productRepository = $repository;
-    }
-
+    /**
+     * Muestra la lista de productos (la tabla).
+     */
     public function index()
     {
-        $productos = $this->productRepository->all();
+        // ¡ESTA ES LA CORRECIÓN!
+        // Usamos el Modelo 'Producto' para traer TODO,
+        // incluyendo los inactivos.
+        $productos = Producto::orderBy('id', 'desc')->get(); 
+
         return view('admin.productos.index', [
             'productos' => $productos
         ]);
     }
 
+    /**
+     * Muestra el formulario para crear un producto.
+     */
     public function create()
     {
         $categorias = Categoria::all(); 
@@ -35,6 +39,9 @@ class ProductCrudController extends Controller
         ]);
     }
 
+    /**
+     * Guarda el nuevo producto en la base de datos.
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -58,7 +65,8 @@ class ProductCrudController extends Controller
             'precio' => $request->precio,
             'stock' => $request->stock,
             'categoria_id' => $request->categoria_id,
-            'url_imagen' => $path
+            'url_imagen' => $path,
+            'is_active' => true // Por defecto está activo
         ]);
 
         return redirect()->route('admin.productos.index')
@@ -66,13 +74,11 @@ class ProductCrudController extends Controller
     }
 
     /**
-     * ¡NUEVO! Muestra el formulario para editar un producto.
+     * Muestra el formulario para editar un producto.
      */
     public function edit(Producto $producto)
     {
-        // $producto ya viene inyectado gracias al Route Model Binding
-        $categorias = Categoria::all(); // También necesitamos las categorías
-        
+        $categorias = Categoria::all();
         return view('admin.productos.edit', [
             'producto' => $producto,
             'categorias' => $categorias
@@ -80,68 +86,61 @@ class ProductCrudController extends Controller
     }
 
     /**
-     * ¡NUEVO! Actualiza el producto en la base de datos.
+     * Actualiza el producto en la base de datos.
      */
     public function update(Request $request, Producto $producto)
     {
-        // 1. Validamos (la imagen ahora es 'nullable', no 'required')
+        // ... (Este método ya estaba bien)
         $request->validate([
             'nombre' => 'required|string|max:100',
             'descripcion' => 'nullable|string',
             'precio' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'categoria_id' => 'required|exists:categorias,id',
-            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048' // <-- CAMBIO
+            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048'
         ]);
-
-        $path = $producto->url_imagen; // Mantenemos la imagen vieja por defecto
-
-        // 2. Si se sube una imagen NUEVA
+        $path = $producto->url_imagen;
         if ($request->hasFile('imagen')) {
-            
-            // 2a. Borramos la imagen vieja del storage
             if ($producto->url_imagen) {
-                // Quitamos '/storage/' para tener la ruta relativa (ej: 'imagenes/mi-vino.jpg')
                 $oldPath = str_replace('/storage/', '', $producto->url_imagen);
                 Storage::disk('public')->delete($oldPath);
             }
-
-            // 2b. Guardamos la imagen nueva
             $path = $request->file('imagen')->store('imagenes', 'public');
             $path = '/storage/' . $path;
         }
-
-        // 3. Actualizamos el producto en la BD
         $producto->update([
             'nombre' => $request->nombre,
             'descripcion' => $request->descripcion,
             'precio' => $request->precio,
             'stock' => $request->stock,
             'categoria_id' => $request->categoria_id,
-            'url_imagen' => $path // Guardamos la ruta (nueva o la vieja)
+            'url_imagen' => $path
         ]);
-
-        // 4. Redirigimos
         return redirect()->route('admin.productos.index')
                          ->with('success', '¡Producto actualizado exitosamente!');
     }
 
     /**
-     * ¡NUEVO! Elimina el producto de la base de datos.
+     * Desactiva (archiva) el producto.
      */
     public function destroy(Producto $producto)
     {
-        // 1. Borramos la imagen del storage
-        if ($producto->url_imagen) {
-            $oldPath = str_replace('/storage/', '', $producto->url_imagen);
-            Storage::disk('public')->delete($oldPath);
-        }
+        $producto->is_active = false;
+        $producto->save();
         
-        // 2. Borramos el producto de la BD
-        $producto->delete();
-        
-        // 3. Redirigimos
         return redirect()->route('admin.productos.index')
-                         ->with('success', '¡Producto eliminado exitosamente!');
+                         ->with('success', '¡Producto desactivado (archivado) exitosamente!');
+    }
+
+    /**
+     * Reactiva un producto que estaba archivado.
+     */
+    public function activate(Producto $producto)
+    {
+        $producto->is_active = true;
+        $producto->save();
+        
+        return redirect()->route('admin.productos.index')
+                         ->with('success', '¡Producto reactivado exitosamente!');
     }
 }

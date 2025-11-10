@@ -3,6 +3,10 @@
 @section('content')
 
 <style>
+    .actions-container .btn {
+        min-width: 90px; 
+        text-align: center;
+    }
     .admin-table {
         width: 100%;
         border-collapse: collapse;
@@ -31,6 +35,23 @@
         border-radius: 5px;
         font-weight: bold;
     }
+    
+    /* ¡AÑADIDO! Estilos para los botones de Activar/Desactivar */
+    .btn {
+        padding: 8px 12px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 0.9em;
+    }
+    .btn-sm { padding: 5px 10px; font-size: 0.8em; }
+    .btn-primary { background-color: #007bff; color: white; }
+    .btn-warning { background-color: #ffc107; color: #333; }
+    .btn-success { background-color: #28a745; color: white; }
+    .gap-2 { gap: 8px; }
+    .d-flex { display: flex; }
+    
 </style>
 
 <div class="admin-header">
@@ -38,35 +59,66 @@
     <a href="{{ route('admin.productos.create') }}">Añadir Nuevo Producto</a>
 </div>
 
+@if(session('success'))
+    <div style="background: #d4edda; color: #155724; padding: 10px; margin-bottom: 20px; text-align: center; border-radius: 5px;">
+        {{ session('success') }}
+    </div>
+@endif
+
 <div style="background: white; padding: 20px; border-radius: 8px;">
     <table class="admin-table">
-        <thead>
+        <thead class="table-light">
             <tr>
                 <th>ID</th>
-                <th>Nombre</th>
-                <th>Precio</th>
-                <th>Stock</th>
-                <th>Acciones</th>
-            </tr>
+                <th>Imagen</th> <th>Nombre</th> <th>Precio</th> <th class="text-center">Stock</th> <th>Acciones</th> </tr>
         </thead>
         <tbody>
             @foreach ($productos as $producto)
             <tr>
                 <td>{{ $producto->id }}</td>
-                <td>{{ $producto->nombre }}</td>
-                <td>$ {{ number_format($producto->precio, 2) }}</td>
-                <td>{{ $producto->stock }}</td>
-                <td class="actions">
-                    <a href="{{ route('admin.productos.edit', $producto->id) }}">Editar</a>
-                    <form action="{{ route('admin.productos.destroy', $producto->id) }}" method="POST" style="display: inline-block;">
-    @csrf
-    @method('DELETE')
+                
+                <td>
+                    <img src="{{ asset($producto->url_imagen) }}" alt="{{ $producto->nombre }}" 
+                         style="width: 50px; height: 50px; object-fit: contain; border-radius: 4px;">
+                </td>
 
-    <button type="submit" style="color: #dc3545; background: none; border: none; cursor: pointer; text-decoration: underline;"
-            onclick="return confirm('¿Estás seguro de que quieres eliminar este producto? Esta acción no se puede deshacer.')">
-        Eliminar
-    </button>
-</form>
+                <td>
+                    {{ $producto->nombre }}
+                    @if(!$producto->is_active)
+                        <span style="font-size: 0.8em; color: #fff; background: #6c757d; padding: 3px 6px; border-radius: 4px; margin-left: 5px;">Archivado</span>
+                    @endif
+                </td>
+
+                <td>S/ {{ number_format($producto->precio, 2) }}</td>
+
+                <td class="text-center 
+                    @if($producto->stock <= 10) text-danger fw-bold @endif">
+                    {{ $producto->stock }}
+                </td>
+
+                <td>
+                    <div class="d-flex gap-2 actions-container">
+
+                        <a href="{{ route('admin.productos.edit', $producto->id) }}" class="btn btn-sm btn-primary">Editar</a>
+
+                        @if ($producto->is_active)
+                            <form action="{{ route('admin.productos.destroy', $producto->id) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-warning"
+                                        onclick="return confirm('¿Estás seguro de que quieres DESACTIVAR este producto?')">
+                                    Desactivar
+                                </button>
+                            </form>
+                        @else
+                            <form action="{{ route('admin.productos.activate', $producto->id) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="btn btn-sm btn-success">
+                                    Activar
+                                </button>
+                            </form>
+                        @endif
+                    </div>
                 </td>
             </tr>
             @endforeach

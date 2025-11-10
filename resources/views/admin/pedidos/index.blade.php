@@ -1,7 +1,30 @@
 @extends('layouts.admin')
-
 @section('content')
+
 <style>
+    .paginacion {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+    .paginacion a, .paginacion span {
+        padding: 8px 15px;
+        text-decoration: none;
+        background: #f0f0f0;
+        color: #333;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-weight: bold;
+    }
+    .paginacion span[aria-disabled="true"] {
+        background: #fafafa;
+        color: #aaa;
+        cursor: not-allowed;
+    }
+    .paginacion a:hover {
+        background: #e0e0e0;
+    }
+
     .admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
     .admin-table th, .admin-table td { border: 1px solid #ddd; padding: 12px; text-align: left; }
     .admin-table th { background-color: #f2f2f2; }

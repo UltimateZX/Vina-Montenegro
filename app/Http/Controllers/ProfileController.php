@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Pedido;
 use App\Http\Requests\ProfileUpdateRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,11 +16,22 @@ class ProfileController extends Controller
      * Display the user's profile form.
      */
     public function edit(Request $request): View
-    {
-        return view('profile.edit', [
-            'user' => $request->user(),
-        ]);
-    }
+{
+    // 1. Obtenemos el usuario (como ya hacía Breeze)
+    $user = $request->user();
+
+    // 2. ¡NUEVO! Obtenemos todos sus pedidos
+    // (Usamos la relación 'pedidos()' que ya definimos en el Modelo Usuario)
+    $pedidos = $user->pedidos()
+                   ->orderBy('fecha_pedido', 'desc')
+                   ->get();
+
+    // 3. Enviamos los pedidos a la vista, además del usuario
+    return view('profile.edit', [
+        'user' => $user,
+        'pedidos' => $pedidos, // <-- ¡NUEVA VARIABLE!
+    ]);
+}
 
     /**
      * Update the user's profile information.

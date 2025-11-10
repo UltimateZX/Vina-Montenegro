@@ -29,7 +29,8 @@ class Producto extends Model
         'descripcion',
         'precio',
         'stock',
-        'url_imagen', // <-- Añadimos este campo a la lista
+        'url_imagen',
+        'is_active' // <-- Añadimos este campo a la lista
     ];
 
     /**

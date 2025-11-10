@@ -16,6 +16,7 @@ class UserController extends Controller
     {
         // Empezamos la consulta a la base de datos
         $query = Usuario::query();
+        
 
         // 1. LÓGICA DE BÚSQUEDA (Ya la teníamos)
         if ($request->filled('search')) {
@@ -44,7 +45,7 @@ class UserController extends Controller
         $query->orderBy($sort_by, $order);
 
         // 4. LÓGICA DE PAGINACIÓN (Ya la teníamos)
-        $usuarios = $query->paginate(10); // Trae 10 por página
+        $usuarios = $query->simplePaginate(10); // Trae 10 por página
 
         // 5. Enviamos todo a la vista
         return view('admin.usuarios.index', [

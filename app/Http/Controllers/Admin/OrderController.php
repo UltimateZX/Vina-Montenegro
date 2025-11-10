@@ -44,7 +44,7 @@ class OrderController extends Controller
         $query->orderBy($sort_by, $order);
 
         // LÓGICA DE PAGINACIÓN
-        $pedidos = $query->paginate(10);
+        $pedidos = $query->simplePaginate(10);
 
         return view('admin.pedidos.index', [
             'pedidos' => $pedidos,
