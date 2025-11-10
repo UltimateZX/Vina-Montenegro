@@ -57,9 +57,13 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
+            'options' => [
+    // ESTA LÍNEA LEE EL CERTIFICADO DE TU .env Y FORZA LA CONEXIÓN SSL
+                            PDO::MYSQL_ATTR_SSL_CA => env('DB_SSL_CA'), 
+
+    // ESTA LÍNEA SÍ VERIFICA EL CERTIFICADO (justo lo que TiDB quiere)
+                            PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => true, 
+                        ],
         ],
 
         'mariadb' => [
