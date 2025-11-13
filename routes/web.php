@@ -57,11 +57,9 @@ Route::get('/pago/exito', function() {
 
 require __DIR__.'/auth.php';
 
-/*
-|--------------------------------------------------------------------------
-| Rutas del Panel de Administrador (SOLO ADMIN)
-|--------------------------------------------------------------------------
-*/
+
+
+
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
