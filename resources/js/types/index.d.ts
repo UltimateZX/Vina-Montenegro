@@ -22,6 +22,8 @@ export interface NavItem {
     isActive?: boolean;
 }
 
+export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & SharedData;
+
 export interface SharedData {
     name: string;
     quote: { message: string; author: string };
@@ -40,4 +42,20 @@ export interface User {
     created_at: string;
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
+}
+
+export interface Producto {
+    id: number;
+    nombre: string;
+    descripcion: string;
+    precio: number;
+    url_imagen: string;
+    stock: number;
+    categoria_id: number;
+}
+
+export interface Categoria {
+    id: number;
+    nombre: string;
+    descripcion: string;
 }

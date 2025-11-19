@@ -8,11 +8,15 @@ use App\Http\Controllers\Admin\PaymentValidationController;
 use App\Http\Controllers\Admin\ProductCrudController;
 // Controladores de Breeze
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProfileController; 
+use App\Http\Controllers\ProfileController;
 // Controladores de la Tienda
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\PaymentController;
+// Adicionales
+use Inertia\Inertia;
+use App\Models\Producto;
+use App\Models\Categoria;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,7 +24,14 @@ use App\Http\Controllers\PaymentController;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', [ProductController::class, 'index'])->name('home');
+Route::get('/', function () {
+    $productos = Producto::all();
+    $categorias = Categoria::all();
+    return Inertia::render('welcome', [
+        'productos' => $productos,
+        'categorias' => $categorias,
+    ]);
+})->name('home');
 
 Route::get('/carrito', [CartController::class, 'index'])->name('cart.index');
 Route::post('/carrito/agregar', [CartController::class, 'add'])->name('cart.add');
@@ -46,7 +57,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout.index');
     Route::post('/checkout', [CartController::class, 'placeOrder'])->name('checkout.placeOrder');
-    
+
     Route::get('/pago/{pedido}', [PaymentController::class, 'index'])->name('payment.index');
     Route::post('/pago/{pedido}', [PaymentController::class, 'storeVoucher'])->name('payment.store');
 });
@@ -86,5 +97,5 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/usuarios/{usuario}', [UserController::class, 'show'])->name('usuarios.show');
     Route::post('/usuarios/{usuario}/toggle-role', [UserController::class, 'toggleRole'])->name('usuarios.toggleRole');
     Route::delete('/usuarios/{usuario}', [UserController::class, 'destroy'])->name('usuarios.destroy');
-    
+
 });

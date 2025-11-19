@@ -44,7 +44,7 @@ return [
 
         'mysql' => [
             'driver' => 'mysql',
-            'url' => env('DB_URL'),
+            'url' => env('DATABASE_URL'),
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
             'database' => env('DB_DATABASE', 'laravel'),
@@ -57,13 +57,7 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
-            'options' => [
-    // ESTA LÍNEA LEE EL CERTIFICADO DE TU .env Y FORZA LA CONEXIÓN SSL
-                            PDO::MYSQL_ATTR_SSL_CA => env('DB_SSL_CA'), 
-
-    // ESTA LÍNEA SÍ VERIFICA EL CERTIFICADO (justo lo que TiDB quiere)
-                            PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => true, 
-                        ],
+            'options' => [],
         ],
 
         'mariadb' => [
