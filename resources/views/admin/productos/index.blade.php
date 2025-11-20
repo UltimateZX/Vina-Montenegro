@@ -3,6 +3,7 @@
 @section('content')
 
 <style>
+    /* Tus estilos originales (se mantienen igual) */
     .actions-container .btn {
         min-width: 90px; 
         text-align: center;
@@ -16,6 +17,7 @@
         border: 1px solid #ddd;
         padding: 12px;
         text-align: left;
+        vertical-align: middle; /* Centra el contenido verticalmente */
     }
     .admin-table th {
         background-color: #f2f2f2;
@@ -36,7 +38,7 @@
         font-weight: bold;
     }
     
-    /* ¡AÑADIDO! Estilos para los botones de Activar/Desactivar */
+    /* Botones */
     .btn {
         padding: 8px 12px;
         border: none;
@@ -44,6 +46,8 @@
         cursor: pointer;
         font-weight: bold;
         font-size: 0.9em;
+        text-decoration: none;
+        display: inline-block;
     }
     .btn-sm { padding: 5px 10px; font-size: 0.8em; }
     .btn-primary { background-color: #007bff; color: white; }
@@ -51,7 +55,15 @@
     .btn-success { background-color: #28a745; color: white; }
     .gap-2 { gap: 8px; }
     .d-flex { display: flex; }
-    
+
+    /* Estilo para la imagen miniatura */
+    .product-thumbnail {
+        width: 50px;
+        height: 50px;
+        object-fit: cover; /* Recorta la imagen para que sea cuadrada perfecta */
+        border-radius: 4px;
+        border: 1px solid #ddd;
+    }
 </style>
 
 <div class="admin-header">
@@ -70,16 +82,25 @@
         <thead class="table-light">
             <tr>
                 <th>ID</th>
-                <th>Imagen</th> <th>Nombre</th> <th>Precio</th> <th class="text-center">Stock</th> <th>Acciones</th> </tr>
+                <th>Imagen</th> 
+                <th>Nombre</th> 
+                <th>Precio</th> 
+                <th class="text-center">Stock</th> 
+                <th>Acciones</th> 
+            </tr>
         </thead>
         <tbody>
             @foreach ($productos as $producto)
             <tr>
                 <td>{{ $producto->id }}</td>
                 
+                <!-- CORRECCIÓN DE IMAGEN -->
                 <td>
-                    <img src="{{ asset($producto->url_imagen) }}" alt="{{ $producto->nombre }}" 
-                         style="width: 50px; height: 50px; object-fit: contain; border-radius: 4px;">
+                    @if($producto->url_imagen)
+                        <img src="{{ $producto->url_imagen }}" alt="{{ $producto->nombre }}" class="product-thumbnail">
+                    @else
+                        <span style="color: #999; font-size: 0.8em;">Sin imagen</span>
+                    @endif
                 </td>
 
                 <td>
@@ -91,8 +112,7 @@
 
                 <td>S/ {{ number_format($producto->precio, 2) }}</td>
 
-                <td class="text-center 
-                    @if($producto->stock <= 10) text-danger fw-bold @endif">
+                <td class="text-center @if($producto->stock <= 10) text-danger fw-bold @endif">
                     {{ $producto->stock }}
                 </td>
 
@@ -102,7 +122,7 @@
                         <a href="{{ route('admin.productos.edit', $producto->id) }}" class="btn btn-sm btn-primary">Editar</a>
 
                         @if ($producto->is_active)
-                            <form action="{{ route('admin.productos.destroy', $producto->id) }}" method="POST">
+                            <form action="{{ route('admin.productos.destroy', $producto->id) }}" method="POST" style="display:inline;">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-sm btn-warning"
@@ -111,7 +131,7 @@
                                 </button>
                             </form>
                         @else
-                            <form action="{{ route('admin.productos.activate', $producto->id) }}" method="POST">
+                            <form action="{{ route('admin.productos.activate', $producto->id) }}" method="POST" style="display:inline;">
                                 @csrf
                                 <button type="submit" class="btn btn-sm btn-success">
                                     Activar

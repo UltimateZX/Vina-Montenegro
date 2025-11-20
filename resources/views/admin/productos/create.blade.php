@@ -23,7 +23,7 @@
         padding: 10px;
         border: 1px solid #ddd;
         border-radius: 4px;
-        box-sizing: border-box; /* Importante para el padding */
+        box-sizing: border-box; 
     }
     .form-group textarea {
         height: 100px;
@@ -47,7 +47,6 @@
         font-size: 1em;
         margin-left: 10px;
     }
-    /* Estilos para errores de validación */
     .alert-danger {
         background-color: #f8d7da;
         color: #721c24;
@@ -75,8 +74,11 @@
         </div>
     @endif
 
+    <!-- CORRECCIÓN AQUÍ: Agregado enctype="multipart/form-data" -->
     <form action="{{ route('admin.productos.store') }}" method="POST" enctype="multipart/form-data">
-        @csrf <div class="form-group">
+        @csrf 
+        
+        <div class="form-group">
             <label for="nombre">Nombre del Producto</label>
             <input type="text" name="nombre" id="nombre" value="{{ old('nombre') }}" required>
         </div>

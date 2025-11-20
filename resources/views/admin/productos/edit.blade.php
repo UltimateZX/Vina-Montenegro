@@ -12,7 +12,7 @@
     }
     .form-group textarea { height: 100px; resize: vertical; }
     .form-actions button {
-        background-color: #007bff; /* Azul para "Actualizar" */
+        background-color: #007bff;
         color: white; padding: 12px 20px; border: none;
         border-radius: 5px; cursor: pointer; font-size: 1em;
     }
@@ -26,6 +26,7 @@
     }
     .current-image {
         max-width: 150px; height: auto; border-radius: 4px; border: 1px solid #ddd;
+        display: block; margin-top: 5px;
     }
 </style>
 
@@ -46,8 +47,12 @@
         </div>
     @endif
 
+    <!-- El enctype está perfecto aquí, lo mantenemos -->
     <form action="{{ route('admin.productos.update', $producto->id) }}" method="POST" enctype="multipart/form-data">
-        @csrf @method('PUT') <div class="form-group">
+        @csrf 
+        @method('PUT') 
+        
+        <div class="form-group">
             <label for="nombre">Nombre del Producto</label>
             <input type="text" name="nombre" id="nombre" value="{{ old('nombre', $producto->nombre) }}" required>
         </div>
@@ -80,8 +85,13 @@
         </div>
 
         <div class="form-group">
-            <label>Imagen Actual</label><br>
-            <img src="{{ asset($producto->url_imagen) }}" alt="{{ $producto->nombre }}" class="current-image">
+            <label>Imagen Actual</label>
+            @if($producto->url_imagen)
+                <!-- CORRECCIÓN IMPORTANTE: Usar Storage disk gcs en lugar de asset -->
+                <img src="{{ $producto->url_imagen }}" alt="{{ $producto->nombre }}" class="product-thumbnail">
+            @else
+                <p style="color: #888; font-style: italic;">Sin imagen asignada</p>
+            @endif
         </div>
 
         <div class="form-group">

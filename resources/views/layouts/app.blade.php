@@ -7,159 +7,111 @@
     
     <style>
         body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            background: #f8f9fa; /* Tono gris claro */
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #f8f9fa;
             margin: 0;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
-        main {
-            flex-grow: 1; /* Empuja el footer hacia abajo */
-        }
+        main { flex-grow: 1; }
         
-        /* --- Header (¡LA PARTE MÁS IMPORTANTE!) --- */
+        /* --- Header PC --- */
         header {
             background: #b42a6a;
             color: white;
-            padding: 0 25px; /* Más padding lateral */
-            display: grid; /* ¡Usamos CSS Grid! */
-            
-            /* Define 3 columnas:
-               1. Izquierda: '1fr' (espacio flexible)
-               2. Centro: 'auto' (lo que ocupe la barra de búsqueda)
-               3. Derecha: '1fr' (espacio flexible)
-            */
-            grid-template-columns: 1fr auto 1fr;
-            
+            padding: 10px 25px;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr; /* 3 Columnas */
             align-items: center;
-            height: 70px;
+            gap: 20px;
             position: sticky;
             top: 0;
             z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        header a { color: white; text-decoration: none; }
+        header a { color: white; text-decoration: none; transition: opacity 0.2s; }
+        header a:hover { opacity: 0.8; }
         
-        .header-left { /* Columna 1 */
-            grid-column: 1;
-        }
-        .header-left .logo { font-size: 1.5em; font-weight: bold; }
+        .header-left .logo { font-size: 1.5em; font-weight: bold; white-space: nowrap; }
         
-        .header-search { /* Columna 2 */
-            grid-column: 2;
-            width: 500px; /* Ancho fijo para la barra */
-            margin: 0 auto; /* Centra la barra en su columna */
+        .header-search {
+            width: 500px; /* Ancho PC */
         }
         .header-search form { display: flex; }
         .header-search input {
-            width: 100%;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 20px 0 0 20px;
-            outline: none;
-            font-size: 0.9em;
+            width: 100%; padding: 10px 15px; border: none; border-radius: 20px 0 0 20px; outline: none;
         }
         .header-search button {
-            border: none;
-            padding: 0 15px;
-            background: #fff;
-            cursor: pointer;
-            border-radius: 0 20px 20px 0;
-            font-size: 1.2em;
+            border: none; padding: 0 15px; background: #fff; cursor: pointer; border-radius: 0 20px 20px 0;
         }
         
-        .header-nav { /* Columna 3 */
-            grid-column: 3;
-            display: flex;
-            justify-content: flex-end; /* Pega los items al final (derecha) */
-            align-items: center; 
-            gap: 20px; /* Espacio entre los elementos */
+        .header-nav {
+            display: flex; justify-content: flex-end; align-items: center; gap: 15px;
         }
-        .header-nav a { font-weight: 500; }
-        .header-nav .admin-link {
-            font-size: 0.9em;
-            font-weight: bold;
-            text-decoration: underline;
-        }
-        .header-nav .cart-toggle { /* Botón Hamburguesa */
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.8em;
-            cursor: pointer;
-            padding: 0 5px;
-        }
-        .user-menu {
-            position: relative;
-            display: inline-block;
-        }
-        .user-menu-btn {
-            background: none;
-            border: none;
-            color: white;
-            font-weight: 500;
-            cursor: pointer;
-            font-size: 1em;
-        }
+        .header-nav a { font-weight: 500; font-size: 0.95em; }
+        
+        .cart-toggle { background: none; border: none; color: white; font-size: 1.5em; cursor: pointer; }
+
+        /* Menú de Usuario */
+        .user-menu { position: relative; display: inline-block; }
+        .user-menu-btn { background: none; border: none; color: white; font-weight: 500; cursor: pointer; font-size: 1em; }
         .user-menu-content {
-            display: none; /* Oculto por defecto */
-            position: absolute;
-            background-color: white;
-            min-width: 160px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-            border-radius: 5px;
-            right: 0;
-            z-index: 101;
+            display: none; position: absolute; background-color: white; min-width: 180px; /* Un poco más ancho */
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2); border-radius: 5px; right: 0; z-index: 101;
         }
-        .user-menu-content a, .user-menu-content form {
-            color: black;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-            font-size: 0.9em;
+        .user-menu-content a, .user-menu-content button {
+            color: black; padding: 12px 16px; text-decoration: none; display: block;
+            background: none; border: none; width: 100%; text-align: left; font-size: 0.95em; cursor: pointer;
         }
-        .user-menu-content a:hover { background-color: #f1f1f1; }
-        .user-menu-content form button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            width: 100%;
-            text-align: left;
-            font-family: inherit;
-            font-size: 1em;
+        .user-menu-content a:hover, .user-menu-content button:hover { background-color: #f1f1f1; }
+        
+        /* Estilo especial para el enlace de Admin dentro del menú */
+        .admin-menu-link { color: #b42a6a !important; font-weight: bold; border-bottom: 1px solid #eee; }
+
+        /* --- 📱 CSS RESPONSIVO (CELULAR) --- */
+        @media (max-width: 900px) {
+            header {
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: auto auto;
+                grid-template-areas: 
+                    "logo nav"
+                    "search search";
+                padding: 10px 15px;
+                gap: 10px;
+            }
+            
+            .header-left { grid-area: logo; }
+            .header-nav { 
+                grid-area: nav; 
+                gap: 10px; 
+                justify-content: flex-end;
+            }
+            
+            .header-search {
+                grid-area: search;
+                width: 100%;
+                margin-top: 5px;
+            }
+            
+            .header-nav a { font-size: 0.85em; white-space: nowrap; }
+            
+            /* Ocultamos el enlace Admin de la barra superior en celular (ya está en el menú) */
+            .header-nav .admin-top-link { display: none; } 
+            
+            .header-nav a span { display: none; } 
+            .header-left .logo { font-size: 1.2em; }
         }
 
-        /* --- Mini Carrito (Offcanvas) --- */
-        #miniCartBackdrop {
-            display: none; /* Oculto */
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-        }
+        /* Mini Carrito Offcanvas */
+        #miniCartBackdrop { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
         #miniCartPartial {
-            display: block;
-            position: fixed;
-            top: 0;
-            right: -400px; /* Oculto fuera de la pantalla */
-            width: 380px;
-            height: 100%;
-            background: white;
-            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
-            z-index: 1001;
-            transition: right 0.3s ease;
+            display: block; position: fixed; top: 0; right: -100%;
+            width: 85%; max-width: 380px; 
+            height: 100%; background: white; z-index: 1001; transition: right 0.3s ease;
         }
         
-        /* --- Footer --- */
-        footer {
-            background: #343A40; /* Gris oscuro */
-            color: #f8f9fa;
-            padding: 40px 20px;
-            text-align: center;
-        }
+        footer { background: #343A40; color: #f8f9fa; padding: 40px 20px; text-align: center; }
     </style>
 </head>
 <body>
@@ -170,41 +122,49 @@
         
         <div class="header-search">
             <form action="{{ route('home') }}" method="GET">
-                <input type="text" name="search" placeholder="Buscar en Viña Montenegro..." value="{{ request('search') }}">
+                <input type="text" name="search" placeholder="Buscar..." value="{{ request('search') }}">
                 <button type="submit">🔍</button>
             </form>
         </div>
 
         <nav class="header-nav">
             @php $cartCount = count(session()->get('cart', [])); @endphp
-            <a href="{{ route('cart.index') }}" title="Ver Carrito">
-                🛒 Carrito ({{ $cartCount }})
+            
+            <a href="{{ route('cart.index') }}" title="Ver Carrito" style="display: flex; align-items: center; gap: 5px;">
+                🛒 <span style="font-size: 0.9em;">({{ $cartCount }})</span>
             </a>
             
             @guest
-                <a href="{{ route('login') }}">👤 Login</a>
-                <a href="{{ route('register') }}">Registro</a>
+                <a href="{{ route('login') }}">Login</a>
+                <a href="{{ route('register') }}" style="border: 1px solid white; padding: 5px 10px; border-radius: 4px;">Registro</a>
             @endguest
             
             @auth
+                <!-- Enlace Admin visible SOLO en PC (clase admin-top-link) -->
                 @if(auth()->user()->rol == 'admin')
-                    <a href="{{ route('admin.dashboard') }}" class="admin-link">
-                        ⚙️ Panel Admin
-                    </a>
+                    <a href="{{ route('admin.dashboard') }}" class="admin-top-link">⚙️ Admin</a>
                 @endif
                 
                 <div class="user-menu">
                     <button class="user-menu-btn" onclick="toggleUserMenu()">
-                        {{ auth()->user()->nombre_completo }} &#9662;
+                        👤 
+                        <span style="display: inline-block; @media(max-width:768px){display:none;}">
+                             {{ Str::limit(auth()->user()->nombre_completo, 10) }}
+                        </span> &#9662;
                     </button>
+                    
                     <div class="user-menu-content" id="userDropdown">
+                        
+                        <!-- ¡AQUÍ ESTÁ! Enlace Admin dentro del menú (Visible en Celular y PC) -->
+                        @if(auth()->user()->rol == 'admin')
+                            <a href="{{ route('admin.dashboard') }}" class="admin-menu-link">⚙️ Panel Admin</a>
+                        @endif
+                        
                         <a href="{{ route('profile.edit') }}">Mi Perfil</a>
+                        
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <a href="{{ route('logout') }}" 
-                               onclick="event.preventDefault(); this.closest('form').submit();">
-                                Log Out
-                            </a>
+                            <button type="submit">Cerrar Sesión</button>
                         </form>
                     </div>
                 </div>
@@ -220,46 +180,32 @@
     
     <footer>
         <p>Viña Montenegro © 2025</p>
-        <p>Contactos, información, etc.</p>
     </footer>
 
     <div id="miniCartBackdrop" onclick="toggleMiniCart()"></div>
     <div id="miniCartPartial">
-        @if(count(session()->get('cart', [])) > 0)
-            @include('partials._mini-cart')
-        @else
-            <div style="padding: 20px; text-align: center;">Tu carrito está vacío.</div>
-        @endif
+        @include('partials._mini-cart')
     </div>
     
     <script>
-        // Lógica para el menú de usuario
         function toggleUserMenu() {
-            var dropdown = document.getElementById('userDropdown');
-            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+            var d = document.getElementById('userDropdown');
+            d.style.display = d.style.display === 'block' ? 'none' : 'block';
         }
-        // Cierra el menú si se hace clic fuera
-        window.onclick = function(event) {
-            if (!event.target.matches('.user-menu-btn')) {
-                var dropdowns = document.getElementsByClassName("user-menu-content");
-                for (var i = 0; i < dropdowns.length; i++) {
-                    dropdowns[i].style.display = 'none';
-                }
+        window.onclick = function(e) {
+            if (!e.target.matches('.user-menu-btn') && !e.target.matches('.user-menu-btn *')) {
+                document.getElementById('userDropdown').style.display = 'none';
             }
         }
-        
-        // Lógica para el mini-carrito
         function toggleMiniCart() {
             var cart = document.getElementById('miniCartPartial');
-            var backdrop = document.getElementById('miniCartBackdrop');
-            var cartCount = {{ $cartCount }};
-            
+            var back = document.getElementById('miniCartBackdrop');
             if (cart.style.right === '0px') {
-                cart.style.right = '-400px';
-                backdrop.style.display = 'none';
-            } else if (cartCount > 0) { // Solo se abre si el carrito no está vacío
+                cart.style.right = '-100%';
+                back.style.display = 'none';
+            } else {
                 cart.style.right = '0px';
-                backdrop.style.display = 'block';
+                back.style.display = 'block';
             }
         }
     </script>

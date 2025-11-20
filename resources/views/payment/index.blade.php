@@ -5,87 +5,56 @@
 <style>
     .payment-page-container {
         max-width: 600px;
-        margin: 30px auto; /* Despega del header y centra */
+        margin: 30px auto;
         background: #fff;
         border-radius: 8px;
         padding: 30px 40px;
         box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         text-align: center;
     }
-    .payment-page-container h2 {
-        margin-top: 0;
-        font-size: 1.8em;
-    }
-    .payment-page-container p {
-        color: #555;
-        font-size: 1.1em;
-        line-height: 1.6;
-    }
+    .payment-page-container h2 { margin-top: 0; font-size: 1.8em; }
+    .payment-page-container p { color: #555; font-size: 1.1em; line-height: 1.6; }
     
-    /* Estilo para el Monto a Pagar */
     .total-amount {
-        font-size: 2.5em;
-        font-weight: bold;
-        color: #b42a6a; /* Color fucsia */
-        margin: 20px 0;
+        font-size: 2.5em; font-weight: bold; color: #b42a6a; margin: 20px 0;
     }
     
-    /* ¡NUEVO! Estilo para el número de Yape */
     .yape-number {
-        font-size: 1.3em;
-        font-weight: bold;
-        margin: 15px 0;
-        background: #fdf2f6;
-        padding: 10px;
-        border-radius: 5px;
+        font-size: 1.3em; font-weight: bold; margin: 15px 0;
+        background: #fdf2f6; padding: 10px; border-radius: 5px;
+        word-break: break-all; /* Evita desbordamiento */
     }
     
-    /* Estilo para la imagen QR */
     .qr-code img {
-        width: 300px;
-        height: 300px;
+        max-width: 100%; /* ¡IMPORTANTE! Para que no se salga en móvil */
+        height: auto;
+        width: 300px; /* Tamaño ideal en PC */
         margin: 10px auto 20px auto;
-        border: 5px solid #eee;
-        border-radius: 8px;
+        border: 5px solid #eee; border-radius: 8px;
     }
 
-    /* Estilos del Formulario de Subida */
-    .form-group {
-        margin-bottom: 20px;
-        text-align: left;
-    }
-    .form-group label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: bold;
-        font-size: 1.1em;
-    }
+    .form-group { margin-bottom: 20px; text-align: left; }
+    .form-group label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 1.1em; }
     .form-group input[type="file"] {
-        width: 100%;
-        padding: 12px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        box-sizing: border-box;
-        font-size: 1em;
+        width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px;
+        box-sizing: border-box; font-size: 1em;
     }
     
-    /* Estilos del Botón */
     .btn-submit-payment {
-        display: block;
-        width: 100%;
-        padding: 15px;
-        background: #28a745; /* Verde para "Finalizar" */
-        color: white;
-        text-decoration: none;
-        text-align: center;
-        border: none;
-        border-radius: 5px;
-        font-size: 1.1em;
-        cursor: pointer;
-        margin-top: 10px;
+        display: block; width: 100%; padding: 15px; background: #28a745; color: white;
+        text-decoration: none; text-align: center; border: none; border-radius: 5px;
+        font-size: 1.1em; cursor: pointer; margin-top: 10px;
     }
-    .btn-submit-payment:hover {
-        background: #218838;
+    .btn-submit-payment:hover { background: #218838; }
+
+    /* --- 📱 CSS RESPONSIVO --- */
+    @media (max-width: 600px) {
+        .payment-page-container {
+            margin: 15px;
+            padding: 25px 15px;
+        }
+        .total-amount { font-size: 2em; }
+        .payment-page-container h2 { font-size: 1.5em; }
     }
 </style>
 
@@ -103,6 +72,7 @@
     </div>
 
     <div class="qr-code">
+        <!-- Asegúrate de tener esta imagen en tu carpeta public/imagenes -->
         <img src="{{ asset('imagenes/qr-yape.png') }}" alt="Código QR de Yape">
     </div>
 

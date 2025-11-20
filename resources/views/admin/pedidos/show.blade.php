@@ -45,7 +45,8 @@
     <div class="voucher-container details-box">
         <h3>Voucher de Pago</h3>
         @if($pedido->pago)
-            <img src="{{ asset($pedido->pago->url_voucher) }}" alt="Voucher" class="voucher-image">
+            <!-- CORRECCIÓN AQUÍ: Quitamos asset() -->
+            <img src="{{ $pedido->pago->url_voucher }}" alt="Voucher" class="voucher-image">
         @else
             <p>No se encontró voucher para este pedido.</p>
         @endif

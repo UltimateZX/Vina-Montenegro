@@ -23,25 +23,15 @@
     .btn-approve { background: #28a745; color: white; }
     .btn-reject { background: #dc3545; color: white; margin-top: 10px; }
     
-    /* ¡NUEVO CSS PARA LA LISTA DE PRODUCTOS! */
     .product-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
+        list-style: none; padding: 0; margin: 0;
     }
     .product-list li {
-        display: flex;
-        justify-content: space-between;
-        padding: 8px 0;
-        border-bottom: 1px solid #eee;
-        font-size: 0.9em;
+        display: flex; justify-content: space-between; padding: 8px 0;
+        border-bottom: 1px solid #eee; font-size: 0.9em;
     }
     .product-list li:last-child { border-bottom: none; }
-    .product-list .qty {
-        font-weight: bold;
-        color: #b42a6a;
-        margin-right: 10px;
-    }
+    .product-list .qty { font-weight: bold; color: #b42a6a; margin-right: 10px; }
     .product-list .name { flex-grow: 1; }
     .product-list .price { color: #555; }
 </style>
@@ -53,9 +43,13 @@
 <div class="validation-layout">
     <div class="voucher-container details-box">
         <h3>Voucher de Pago (Haz clic para ampliar)</h3>
-        <a href="{{ asset($pedido->pago->url_voucher) }}" target="_blank">
-            <img src="{{ asset($pedido->pago->url_voucher) }}" alt="Voucher" class="voucher-image">
+        
+        <!-- CORRECCIÓN AQUÍ: Quitamos asset() en ambos lugares -->
+        <!-- Usamos la variable directa $pedido->pago->url_voucher -->
+        <a href="{{ $pedido->pago->url_voucher }}" target="_blank">
+            <img src="{{ $pedido->pago->url_voucher }}" alt="Voucher" class="voucher-image">
         </a>
+
     </div>
     
     <div class="order-details">

@@ -24,14 +24,14 @@ class Producto extends Model
      * ¡AQUÍ ESTÁ LA CORRECCIÓN!
      */
     protected $fillable = [
-        'categoria_id',
-        'nombre',
-        'descripcion',
-        'precio',
-        'stock',
-        'url_imagen',
-        'is_active' // <-- Añadimos este campo a la lista
-    ];
+    'nombre',
+    'descripcion',
+    'precio',
+    'stock',
+    'categoria_id',
+    'is_active',
+    'url_imagen', // <--- ESTO ES LO QUE HACE QUE SE GUARDE EN LA BD
+];
 
     /**
      * Define la relación con Categoria.

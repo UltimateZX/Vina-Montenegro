@@ -2,7 +2,9 @@
 
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
-use Illuminate\Foundation\Configuration\Middleware; // <-- Asegúrate de que esto esté
+use Illuminate\Foundation\Configuration\Middleware;
+// IMPORTANTE: Usamos el nombre real de tu archivo
+use App\Http\Middleware\CheckAdminRole; 
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -12,11 +14,14 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         
-        // ¡AÑADE ESTA LÍNEA AQUÍ DENTRO!
-        $middleware->alias([
-            'admin' => \App\Http\Middleware\CheckAdminRole::class,
-        ]);
+        // Solución Error 419 (Proxy de Google)
+        $middleware->trustProxies(at: '*');
 
+        // Solución Error "Target class admin does not exist"
+        $middleware->alias([
+            'admin' => CheckAdminRole::class,
+        ]);
+        
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

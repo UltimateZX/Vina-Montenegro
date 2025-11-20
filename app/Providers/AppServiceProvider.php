@@ -2,20 +2,11 @@
 
 namespace App\Providers;
 
-use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\URL; // <--- 1. AGREGAR ESTO ARRIBA
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * The path to your application's "home" route.
-     *
-     * Typically, users are redirected here after authentication.
-     *
-     * @var string
-     */
-    public const HOME = '/'; 
-
     /**
      * Register any application services.
      */
@@ -29,6 +20,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Paginator::useBootstrapFive();
+        // 2. AGREGAR ESTE BLOQUE DENTRO DE BOOT
+        if ($this->app->environment('production')) {
+            URL::forceScheme('https');
+        }
     }
 }
