@@ -10,16 +10,21 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
-use Illuminate\View\View;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class RegisteredUserController extends Controller
 {
     /**
      * Display the registration view.
      */
-    public function create(): View
+    public function create(): Response
     {
-        return view('auth.register');
+        return Inertia::render('auth/register', [
+            'canResetPassword' => Route::has('password.request'),
+            'status' => session('status'),
+        ]);
     }
 
     /**
@@ -30,8 +35,8 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            
-            'nombre_completo' => ['required', 'string', 'max:100'], 
+
+            'nombre_completo' => ['required', 'string', 'max:100'],
             'email' => ['required', 'string', 'email', 'max:100', 'unique:'.Usuario::class],
             // Usamos las reglas de Laravel para la contraseña
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
@@ -49,6 +54,6 @@ class RegisteredUserController extends Controller
         Auth::login($user);
 
         // Puedes cambiar esto a '/' si quieres que redirija al home
-        return redirect(route('home', absolute: false)); 
+        return redirect(route('home', absolute: false));
     }
 }

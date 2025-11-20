@@ -1,6 +1,6 @@
 import { Link } from '@inertiajs/react';
-import { route } from 'ziggy-js'; // <-- ¡Importante!
-import { ShoppingCart, User } from 'lucide-react'; // <-- Importamos iconos
+import { route } from 'ziggy-js';
+import { ShoppingCart, User } from 'lucide-react';
 
 export function WelcomeHeader() {
     return (
