@@ -23,8 +23,8 @@ class ProfileController extends Controller
     // 2. ¡NUEVO! Obtenemos todos sus pedidos
     // (Usamos la relación 'pedidos()' que ya definimos en el Modelo Usuario)
     $pedidos = $user->pedidos()
-                   ->orderBy('fecha_pedido', 'desc')
-                   ->get();
+                ->orderBy('fecha_pedido', 'desc')
+                ->get();
 
     // 3. Enviamos los pedidos a la vista, además del usuario
     return view('profile.edit', [

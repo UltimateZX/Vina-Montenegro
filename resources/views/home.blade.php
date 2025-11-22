@@ -76,6 +76,7 @@
         display: flex;
         flex-direction: column;
         transition: transform 0.2s;
+        position: relative; /* Para posicionar elementos si fuera necesario */
     }
     .producto-card:hover {
         transform: translateY(-3px);
@@ -94,6 +95,19 @@
     .card-content .precio { font-size: 1.3em; color: #b42a6a; font-weight: bold; margin: 5px 0; }
     .card-content small { color: #777; display: block; margin-bottom: 15px; line-height: 1.4; }
 
+    /* --- NUEVO: Estilos del Stock --- */
+    .stock-badge {
+        font-size: 0.85em;
+        font-weight: bold;
+        padding: 4px 8px;
+        border-radius: 4px;
+        display: inline-block;
+        margin-bottom: 10px;
+    }
+    .stock-high { color: #155724; background-color: #d4edda; } /* Verde */
+    .stock-low { color: #856404; background-color: #fff3cd; }  /* Naranja */
+    .stock-out { color: #721c24; background-color: #f8d7da; }  /* Rojo */
+
     .producto-card button {
         background: #333; 
         color: white;
@@ -106,6 +120,12 @@
         transition: background 0.2s;
     }
     .producto-card button:hover { background: #b42a6a; }
+    
+    /* Estilo para botón deshabilitado (Agotado) */
+    .producto-card button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+    }
 
     /* --- 📱 CSS RESPONSIVO (CELULARES Y TABLETS) --- */
     @media (max-width: 900px) {
@@ -142,6 +162,12 @@
 @if(session('success'))
     <div style="max-width: 1200px; margin: 20px auto; background: #d4edda; color: #155724; padding: 15px; text-align: center; border-radius: 5px; border: 1px solid #c3e6cb;">
         {{ session('success') }}
+    </div>
+@endif
+
+@if(session('error'))
+    <div style="max-width: 1200px; margin: 20px auto; background: #f8d7da; color: #721c24; padding: 15px; text-align: center; border-radius: 5px; border: 1px solid #f5c6cb;">
+        {{ session('error') }}
     </div>
 @endif
 
@@ -199,16 +225,34 @@
                         <div class="card-content">
                             <h3>{{ $producto->nombre }}</h3>
                             <p class="precio">S/ {{ number_format($producto->precio, 2) }}</p>
-                            <!-- Limitamos la descripción para que no rompa el diseño -->
+                            
+                            <!-- INFORMACIÓN DE STOCK -->
+                            <div>
+                                @if($producto->stock > 10)
+                                    <span class="stock-badge stock-high">Stock: {{ $producto->stock }}</span>
+                                @elseif($producto->stock > 0)
+                                    <span class="stock-badge stock-low">¡Solo quedan {{ $producto->stock }}!</span>
+                                @else
+                                    <span class="stock-badge stock-out">Agotado</span>
+                                @endif
+                            </div>
+                            
                             <small>{{ Str::limit($producto->descripcion, 80) }}</small>
                         </div>
                         
                         <form action="{{ route('cart.add') }}" method="POST" style="margin-top: auto;">
                             @csrf
                             <input type="hidden" name="product_id" value="{{ $producto->id }}">
-                            <button type="submit">
-                                Añadir al Carrito 🛒
-                            </button>
+                            
+                            @if($producto->stock > 0)
+                                <button type="submit">
+                                    Añadir al Carrito 🛒
+                                </button>
+                            @else
+                                <button type="button" disabled>
+                                    Sin Stock 🚫
+                                </button>
+                            @endif
                         </form>
                     </div>
                 @endforeach

@@ -58,11 +58,22 @@ class PaymentValidationController extends Controller
     }
 
     /**
-     * Rechaza un pago.
+     * Rechaza un pago y DEVUELVE EL STOCK.
      */
     public function reject(Request $request, Pedido $pedido)
     {
         $request->validate(['notas_admin' => 'required|string|max:255']);
+        
+        // --- CORRECCIÓN: DEVOLUCIÓN DE STOCK ---
+        // Antes de cancelar, recorremos los productos y devolvemos la cantidad al inventario
+        foreach ($pedido->detalles_pedido as $detalle) {
+            $producto = $detalle->producto;
+            if ($producto) {
+                $producto->stock += $detalle->cantidad; // Sumamos de vuelta lo que se había apartado
+                $producto->save();
+            }
+        }
+        // ---------------------------------------
         
         // Actualizamos el estado del pedido
         $pedido->estado = 'cancelado';
@@ -77,6 +88,6 @@ class PaymentValidationController extends Controller
         }
         
         return redirect()->route('admin.pagos.index')
-                         ->with('success', '¡Pedido #' . $pedido->id . ' ha sido rechazado!');
+                         ->with('success', '¡Pedido #' . $pedido->id . ' rechazado y stock restaurado al inventario!');
     }
 }

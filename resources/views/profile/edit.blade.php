@@ -14,14 +14,30 @@
         display: inline-block;
         text-align: center;
         transition: background 0.2s;
+        border: none;
+        cursor: pointer;
     }
-    .btn-pay-now:hover {
-        background-color: #218838;
+    .btn-pay-now:hover { background-color: #218838; }
+
+    .btn-cancel-order {
+        background-color: #dc3545; /* Rojo */
+        color: white;
+        padding: 8px 12px;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 0.9em;
+        font-weight: bold;
+        display: inline-block;
+        text-align: center;
+        transition: background 0.2s;
+        border: none;
+        cursor: pointer;
     }
+    .btn-cancel-order:hover { background-color: #c82333; }
     
     .profile-container {
         max-width: 900px;
-        margin: 30px auto; /* Para despegarlo del header */
+        margin: 30px auto; 
         padding: 0 20px;
     }
     
@@ -60,24 +76,23 @@
     .admin-table th { background-color: #f9f9f9; color: #555; font-weight: 600; text-transform: uppercase; font-size: 0.85em; letter-spacing: 0.5px; }
     .admin-table tr:last-child td { border-bottom: none; }
 
-    /* Estados con colores */
     .status-procesando { color: #007bff; font-weight: bold; background: #e7f1ff; padding: 4px 8px; border-radius: 4px; font-size: 0.9em; }
     .status-cancelado { color: #dc3545; font-weight: bold; background: #fce8ea; padding: 4px 8px; border-radius: 4px; font-size: 0.9em; }
     .status-completado { color: #28a745; font-weight: bold; background: #e6f4ea; padding: 4px 8px; border-radius: 4px; font-size: 0.9em; }
     .status-pendiente_validacion { color: #e67e22; font-weight: bold; background: #fdf3e5; padding: 4px 8px; border-radius: 4px; font-size: 0.9em; }
     .status-pendiente_pago { color: #6c757d; font-weight: bold; background: #f2f2f2; padding: 4px 8px; border-radius: 4px; font-size: 0.9em; }
 
+    .user-actions { display: flex; gap: 5px; flex-wrap: wrap; }
+
     /* --- 📱 RESPONSIVIDAD (CELULAR) --- */
     @media (max-width: 768px) {
         .profile-container { padding: 10px; margin: 15px auto; }
         .profile-card { padding: 20px; }
         
-        /* Transformar Tabla en Tarjetas */
         .admin-table, .admin-table thead, .admin-table tbody, .admin-table th, .admin-table td, .admin-table tr { 
             display: block; 
         }
-        
-        .admin-table thead { display: none; } /* Ocultar encabezados */
+        .admin-table thead { display: none; } 
         
         .admin-table tr {
             border: 1px solid #eee;
@@ -92,30 +107,22 @@
             border: none;
             padding: 8px 0;
             position: relative;
-            padding-left: 40%; /* Espacio para la etiqueta */
+            padding-left: 40%; 
             text-align: right;
         }
         
-        /* Etiquetas simuladas (Fecha, Total, etc.) */
         .admin-table td:before {
-            position: absolute;
-            top: 8px;
-            left: 0;
-            width: 35%;
-            white-space: nowrap;
-            font-weight: bold;
-            color: #777;
-            text-align: left;
+            position: absolute; top: 8px; left: 0; width: 35%; white-space: nowrap; font-weight: bold; color: #777; text-align: left;
         }
         
-        /* Contenido de las etiquetas */
         .admin-table td:nth-of-type(1):before { content: "ID Pedido"; }
         .admin-table td:nth-of-type(2):before { content: "Fecha"; }
         .admin-table td:nth-of-type(3):before { content: "Total"; }
         .admin-table td:nth-of-type(4):before { content: "Estado"; }
         .admin-table td:nth-of-type(5):before { content: "Acciones"; }
         
-        .btn-pay-now { width: 100%; box-sizing: border-box; margin-top: 5px; }
+        .user-actions { justify-content: flex-end; }
+        .btn-pay-now, .btn-cancel-order { width: 100%; box-sizing: border-box; margin-top: 5px; }
     }
 </style>
 
@@ -174,6 +181,17 @@
     <div class="profile-card">
         <h2>Historial de Mis Pedidos</h2>
         
+        @if(session('success'))
+            <div style="background: #d4edda; color: #155724; padding: 10px; margin-bottom: 15px; border-radius: 5px;">
+                {{ session('success') }}
+            </div>
+        @endif
+        @if(session('error'))
+            <div style="background: #f8d7da; color: #721c24; padding: 10px; margin-bottom: 15px; border-radius: 5px;">
+                {{ session('error') }}
+            </div>
+        @endif
+        
         @if($pedidos->isEmpty())
             <div style="text-align: center; color: #777; padding: 20px;">
                 <p>Aún no has realizado ningún pedido.</p>
@@ -202,13 +220,26 @@
                                 </span>
                             </td>
                             <td>
-                                @if($pedido->estado == 'pendiente_pago')
-                                    <a href="{{ route('payment.index', ['pedido' => $pedido->id]) }}" class="btn-pay-now">
-                                        Pagar Ahora
-                                    </a>
-                                @else
-                                    <span style="color: #aaa;">--</span>
-                                @endif
+                                <div class="user-actions">
+                                    @if($pedido->estado == 'pendiente_pago' || $pedido->estado == 'pendiente_validacion')
+                                        
+                                        @if($pedido->estado == 'pendiente_pago')
+                                            <a href="{{ route('payment.index', ['pedido' => $pedido->id]) }}" class="btn-pay-now">
+                                                Pagar
+                                            </a>
+                                        @endif
+
+                                        <form action="{{ route('user.pedidos.cancel', $pedido->id) }}" method="POST" style="margin:0;">
+                                            @csrf
+                                            <button type="submit" class="btn-cancel-order" onclick="return confirm('¿Estás seguro de cancelar este pedido? El stock será liberado.')">
+                                                Cancelar
+                                            </button>
+                                        </form>
+                                        
+                                    @else
+                                        <span style="color: #aaa; font-size: 0.9em;">Sin acciones</span>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                     @endforeach

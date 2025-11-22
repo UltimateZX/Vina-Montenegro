@@ -3,43 +3,63 @@
 @section('content')
 
 <style>
-    .form-container { background: white; padding: 30px; border-radius: 8px; }
+    .form-container {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        max-width: 800px;
+        margin: 0 auto;
+    }
     .form-group { margin-bottom: 20px; }
-    .form-group label { display: block; margin-bottom: 8px; font-weight: bold; }
+    .form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #333; }
+    
     .form-group input, .form-group textarea, .form-group select {
-        width: 100%; padding: 10px; border: 1px solid #ddd;
-        border-radius: 4px; box-sizing: border-box;
+        width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px;
+        box-sizing: border-box; font-size: 1em; font-family: inherit;
     }
-    .form-group textarea { height: 100px; resize: vertical; }
-    .form-actions button {
-        background-color: #007bff;
-        color: white; padding: 12px 20px; border: none;
-        border-radius: 5px; cursor: pointer; font-size: 1em;
+    .form-group textarea { height: 120px; resize: vertical; }
+    
+    .form-actions { display: flex; align-items: center; gap: 15px; margin-top: 30px; }
+    
+    .btn-update {
+        background-color: #007bff; color: white; padding: 12px 25px; border: none;
+        border-radius: 5px; cursor: pointer; font-size: 1em; font-weight: bold;
+        text-decoration: none; display: inline-block; text-align: center;
     }
-    .form-actions a {
-        background-color: #6c757d; color: white; padding: 12px 20px;
-        text-decoration: none; border-radius: 5px; font-size: 1em; margin-left: 10px;
+    .btn-cancel { color: #6c757d; text-decoration: underline; font-size: 1em; }
+
+    .product-thumbnail {
+        width: 100px; height: 100px; object-fit: contain; 
+        border: 1px solid #ddd; border-radius: 5px; padding: 5px; background: #fff;
     }
+
     .alert-danger {
-        background-color: #f8d7da; color: #721c24; padding: 10px;
-        border: 1px solid #f5c6cb; border-radius: 4px; margin-bottom: 20px;
+        background-color: #f8d7da; color: #721c24; padding: 15px;
+        border-radius: 5px; margin-bottom: 25px; border: 1px solid #f5c6cb;
     }
-    .current-image {
-        max-width: 150px; height: auto; border-radius: 4px; border: 1px solid #ddd;
-        display: block; margin-top: 5px;
+
+    .admin-header h1 { font-size: 1.8em; color: #333; margin-bottom: 20px; text-align: center; }
+
+    /* --- 📱 MÓVIL --- */
+    @media (max-width: 768px) {
+        .form-container { padding: 20px; margin: 10px; }
+        .form-actions { flex-direction: column; gap: 15px; }
+        .btn-update { width: 100%; }
+        .btn-cancel { display: block; padding: 10px; }
     }
 </style>
 
 <div class="admin-header">
-    <h1>Editar Producto: {{ $producto->nombre }}</h1>
+    <h1>Editar Producto</h1>
 </div>
 
 <div class="form-container">
 
     @if ($errors->any())
         <div class="alert alert-danger">
-            <strong>¡Ups!</strong> Hubo algunos problemas.<br><br>
-            <ul>
+            <strong>Error:</strong>
+            <ul style="margin: 10px 0 0 20px; padding: 0;">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
@@ -47,7 +67,6 @@
         </div>
     @endif
 
-    <!-- El enctype está perfecto aquí, lo mantenemos -->
     <form action="{{ route('admin.productos.update', $producto->id) }}" method="POST" enctype="multipart/form-data">
         @csrf 
         @method('PUT') 
@@ -62,14 +81,17 @@
             <textarea name="descripcion" id="descripcion">{{ old('descripcion', $producto->descripcion) }}</textarea>
         </div>
 
-        <div class="form-group">
-            <label for="precio">Precio</label>
-            <input type="number" name="precio" id="precio" step="0.01" value="{{ old('precio', $producto->precio) }}" required>
-        </div>
-
-        <div class="form-group">
-            <label for="stock">Stock (Cantidad)</label>
-            <input type="number" name="stock" id="stock" value="{{ old('stock', $producto->stock) }}" required>
+        <!-- Grid para precio y stock -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="precio">Precio (S/)</label>
+                <input type="number" name="precio" id="precio" step="0.01" value="{{ old('precio', $producto->precio) }}" required>
+            </div>
+    
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="stock">Stock</label>
+                <input type="number" name="stock" id="stock" value="{{ old('stock', $producto->stock) }}" required>
+            </div>
         </div>
 
         <div class="form-group">
@@ -87,22 +109,20 @@
         <div class="form-group">
             <label>Imagen Actual</label>
             @if($producto->url_imagen)
-                <!-- CORRECCIÓN IMPORTANTE: Usar Storage disk gcs en lugar de asset -->
-                <img src="{{ $producto->url_imagen }}" alt="{{ $producto->nombre }}" class="product-thumbnail">
+                <div style="margin-bottom: 10px;">
+                    <img src="{{ $producto->url_imagen }}" alt="{{ $producto->nombre }}" class="product-thumbnail">
+                </div>
             @else
-                <p style="color: #888; font-style: italic;">Sin imagen asignada</p>
+                <p style="color: #888; font-style: italic; margin-bottom: 10px;">Sin imagen asignada</p>
             @endif
-        </div>
-
-        <div class="form-group">
-            <label for="imagen">Subir Nueva Imagen (Opcional)</label>
+            
+            <label for="imagen" style="margin-top: 15px;">Cambiar Imagen (Opcional)</label>
             <input type="file" name="imagen" id="imagen">
-            <small>Si no seleccionas una nueva, se mantendrá la imagen actual.</small>
         </div>
 
         <div class="form-actions">
-            <button type="submit">Actualizar Producto</button>
-            <a href="{{ route('admin.productos.index') }}">Cancelar</a>
+            <button type="submit" class="btn-update">Actualizar Producto</button>
+            <a href="{{ route('admin.productos.index') }}" class="btn-cancel">Cancelar</a>
         </div>
     </form>
 </div>
