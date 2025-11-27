@@ -1,6 +1,5 @@
-import { useEffect } from 'react';
-import { X, ShoppingCart, Plus, Minus, Trash2 } from 'lucide-react';
 import useCartStore from '@/hooks/useCartStore';
+import { X, Trash2, Minus, Plus } from 'lucide-react';
 
 interface CartSidebarProps {
     isOpen: boolean;
@@ -8,15 +7,9 @@ interface CartSidebarProps {
 }
 
 export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
-    const { items: cartItems, fetchCart, updateQuantity, removeFromCart, clearCart } = useCartStore();
+    const { items, removeFromCart, updateQuantity, clearCart } = useCartStore();
 
-    useEffect(() => {
-        if (isOpen) {
-            fetchCart();
-        }
-    }, [isOpen, fetchCart]);
-
-    const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
     return (
         <>
@@ -37,12 +30,11 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
                     <div className="flex items-center gap-2">
-                        <ShoppingCart className="w-6 h-6 text-[#A42C6C]" />
                         <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                             Carrito
                         </h2>
                         <span className="bg-[#A42C6C] text-white text-xs rounded-full px-2 py-1">
-                            {cartItems.length}
+                            {items.length}
                         </span>
                     </div>
                     <button
@@ -56,14 +48,13 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
 
                 {/* Lista de productos */}
                 <div className="flex-1 overflow-y-auto p-6">
-                    {cartItems.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400">
-                            <ShoppingCart className="w-16 h-16 mb-4 opacity-50" />
+                    {items.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-100">
                             <p className="text-lg">Tu carrito está vacío</p>
                         </div>
                     ) : (
                         <div className="space-y-4">
-                            {cartItems.map(item => (
+                            {items.map(item => (
                                 <div
                                     key={item.id}
                                     className="flex gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg"
@@ -74,23 +65,23 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                                         className="w-20 h-20 object-cover rounded-md"
                                     />
                                     <div className="flex-1">
-                                        <h3 className="font-semibold text-sm">{item.name}</h3>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                                            ${new Intl.NumberFormat('es-CL').format(item.price)}
+                                        <h3 className="font-semibold text-sm dark:text-gray-100">{item.name}</h3>
+                                        <p className="text-xs text-gray-600 dark:text-gray-400">
+                                            S/{new Intl.NumberFormat('es-PE', {minimumFractionDigits: 2}).format(item.price)}
                                         </p>
                                         <div className="flex items-center gap-2 mt-2">
-                                            <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="p-1 bg-gray-200 dark:bg-gray-700 rounded-full">
+                                            <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="p-1 bg-gray-200 dark:bg-gray-400 rounded-full">
                                                 <Minus className="w-4 h-4" />
                                             </button>
-                                            <span>{item.quantity}</span>
-                                            <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="p-1 bg-gray-200 dark:bg-gray-700 rounded-full">
+                                            <span className="text-gray-800 dark:text-gray-100">{item.quantity}</span>
+                                            <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="p-1 bg-gray-200 dark:bg-gray-400 rounded-full">
                                                 <Plus className="w-4 h-4" />
                                             </button>
                                         </div>
                                     </div>
                                     <div className="flex flex-col items-end justify-between">
-                                        <p className="font-bold text-sm">
-                                            ${new Intl.NumberFormat('es-CL').format(item.price * item.quantity)}
+                                        <p className="font-bold text-sm dark:text-gray-100">
+                                            TOTAL: S/{new Intl.NumberFormat('es-PE', {minimumFractionDigits: 2}).format(item.price * item.quantity)}
                                         </p>
                                         <button onClick={() => removeFromCart(item.id)} className="text-red-500 hover:text-red-700">
                                             <Trash2 className="w-5 h-5" />
@@ -103,20 +94,20 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                 </div>
 
                 {/* Footer */}
-                {cartItems.length > 0 && (
+                {items.length > 0 && (
                     <div className="p-6 border-t border-gray-200 dark:border-gray-700">
-                        <div className="flex justify-between items-center mb-4">
-                            <span className="text-lg font-semibold">Total</span>
+                        <div className="flex justify-between items-center mb-4 bg-gray-200 dark:bg-gray-800 p-4 rounded-lg">
+                            <span className="text-lg font-semibold text-[#A42C6C]">TOTAL:</span>
                             <span className="text-xl font-bold text-[#A42C6C]">
-                                ${new Intl.NumberFormat('es-CL').format(total)}
+                                S/{new Intl.NumberFormat('es-PE', {minimumFractionDigits: 2}).format(subtotal)}
                             </span>
                         </div>
-                        <button className="w-full bg-[#A42C6C] text-white py-3 rounded-lg font-semibold hover:bg-[#92265b] transition-colors">
+                        <button className="w-full bg-[#A42C6C] text-white py-3 rounded-lg font-semibold hover:bg-[#92265b] transition-colors duration-300">
                             Finalizar Compra
                         </button>
                         <button
                             onClick={clearCart}
-                            className="w-full mt-2 text-center text-sm text-gray-500 hover:text-red-500"
+                            className="w-full mt-2 text-center text-sm text-gray-600 dark:text-gray-200 hover:text-red-500 border border-gray-300 hover:border-red-500 rounded-lg py-2 transition-colors duration-300"
                         >
                             Vaciar Carrito
                         </button>

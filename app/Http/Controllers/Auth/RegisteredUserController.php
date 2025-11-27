@@ -36,14 +36,14 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
 
-            'nombre_completo' => ['required', 'string', 'max:100'],
+            'name' => ['required', 'string', 'max:100'],
             'email' => ['required', 'string', 'email', 'max:100', 'unique:'.Usuario::class],
             // Usamos las reglas de Laravel para la contraseña
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
         $user = Usuario::create([
-            'nombre_completo' => $request->nombre_completo,
+            'nombre_completo' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password), // <-- Usamos Hash
             'rol' => 'cliente', // <-- Asignamos 'cliente' por defecto
@@ -54,6 +54,6 @@ class RegisteredUserController extends Controller
         Auth::login($user);
 
         // Puedes cambiar esto a '/' si quieres que redirija al home
-        return redirect(route('home', absolute: false));
+        return redirect()->back();
     }
 }

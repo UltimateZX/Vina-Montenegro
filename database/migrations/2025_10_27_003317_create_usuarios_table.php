@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('nombre_completo', 100);
             $table->string('email', 100)->unique();
-            $table->string('password_hash', 255); // O usa $table->string('password');
+            $table->string('password', 255); // O usa $table->string('password');
             $table->enum('rol', ['cliente', 'admin'])->default('cliente');
             $table->timestamp('fecha_registro')->default(DB::raw('CURRENT_TIMESTAMP'));
         });

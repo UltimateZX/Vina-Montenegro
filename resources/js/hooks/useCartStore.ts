@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import axios from 'axios';
 
+// Interfaz para los items DENTRO del carrito (consistente con el backend)
 interface CartItem {
     id: number;
     name: string;
@@ -9,6 +10,7 @@ interface CartItem {
     image?: string;
 }
 
+// Interfaz para un producto que se va a AÑADIR (desde ProductCard)
 interface Producto {
     id: number;
     nombre: string;
@@ -19,7 +21,7 @@ interface Producto {
 
 interface CartState {
     items: CartItem[];
-    addToCart: (product: Producto) => void;
+    addToCart: (product: Producto, quantity: number) => void;
     fetchCart: () => void;
     clearCart: () => void;
     removeFromCart: (productId: number) => void;
@@ -31,17 +33,22 @@ const useCartStore = create<CartState>((set, get) => ({
     fetchCart: async () => {
         try {
             const response = await axios.get('/cart');
-            const cartData = response.data;
-            const items = Object.values(cartData) as CartItem[];
+            const items = response.data as CartItem[];
             set({ items });
         } catch (error) {
             console.error('Error fetching cart:', error);
+            set({ items: [] }); // En caso de error, asegurar que el carrito esté vacío
         }
     },
-    addToCart: async (product) => {
+    addToCart: async (product, quantity) => {
         try {
-            await axios.post('/cart/add', { product_id: product.id });
-            get().fetchCart(); // Recargar el carrito desde el servidor
+            // Usamos los nombres de campo que el backend espera
+            await axios.post('/cart/add', {
+                product_id: product.id,
+                quantity: quantity
+            });
+            // Después de añadir, volvemos a pedir el carrito actualizado al backend
+            get().fetchCart();
         } catch (error) {
             console.error('Error adding to cart:', error);
         }
@@ -56,6 +63,7 @@ const useCartStore = create<CartState>((set, get) => ({
     },
     updateQuantity: async (productId, quantity) => {
         if (quantity <= 0) {
+            // Si la cantidad es 0 o menos, simplemente lo eliminamos
             get().removeFromCart(productId);
         } else {
             try {
@@ -69,6 +77,7 @@ const useCartStore = create<CartState>((set, get) => ({
     clearCart: async () => {
         try {
             await axios.post('/cart/clear');
+            // Vaciamos el estado local inmediatamente para una respuesta visual rápida
             set({ items: [] });
         } catch (error) {
             console.error('Error clearing cart:', error);

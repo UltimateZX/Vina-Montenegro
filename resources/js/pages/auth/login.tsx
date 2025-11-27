@@ -1,20 +1,20 @@
-import { useEffect } from 'react';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { useEffect, FormEventHandler } from 'react';
+import { useForm } from '@inertiajs/react';
 import { route } from 'ziggy-js';
-import AuthLayout from '@/layouts/auth-layout';
-import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import InputError from '@/components/input-error';
+import { Label } from '@/components/ui/label';
 
 interface LoginProps {
     status?: string;
     canResetPassword: boolean;
-    canRegister: boolean;
+    onSwitchToRegister: () => void;
+    onSuccess?: () => void;
 }
 
-export default function Login({ status, canResetPassword, canRegister }: LoginProps) {
+export function LoginForm({ status, canResetPassword, onSwitchToRegister, onSuccess }: LoginProps) {
     const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
         password: '',
@@ -25,20 +25,25 @@ export default function Login({ status, canResetPassword, canRegister }: LoginPr
         return () => {
             reset('password');
         };
-    }, []);
+    }, [reset]);
 
-    const submit = (e: React.FormEvent) => {
+    const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        post(route('login'));
+        post(route('login'), {
+            onSuccess: () => {
+                reset();
+                if (onSuccess) {
+                    onSuccess();
+                }
+            },
+            onError: () => {
+                reset('password');
+            },
+        });
     };
 
     return (
-        <AuthLayout
-            title="Log in to your account"
-            description="Enter your email and password below to log in"
-        >
-            <Head title="Log in" />
-
+        <>
             {status && <div className="mb-4 font-medium text-sm text-green-600">{status}</div>}
 
             <form onSubmit={submit} className="space-y-4">
@@ -80,12 +85,12 @@ export default function Login({ status, canResetPassword, canRegister }: LoginPr
                     </label>
 
                     {canResetPassword && (
-                        <Link
+                        <a
                             href={route('password.request')}
                             className="text-sm text-primary underline-offset-4 hover:underline"
                         >
                             Forgot your password?
-                        </Link>
+                        </a>
                     )}
                 </div>
 
@@ -93,15 +98,13 @@ export default function Login({ status, canResetPassword, canRegister }: LoginPr
                     Log in
                 </Button>
 
-                {canRegister && (
-                    <div className="mt-4 text-center text-sm">
-                        Don't have an account?{' '}
-                        <Link href={route('register')} className="text-primary underline">
-                            Register
-                        </Link>
-                    </div>
-                )}
+                <div className="mt-4 text-center text-sm">
+                    Don't have an account?{' '}
+                    <button type="button" onClick={onSwitchToRegister} className="text-primary underline font-semibold">
+                        Register
+                    </button>
+                </div>
             </form>
-        </AuthLayout>
+        </>
     );
 }

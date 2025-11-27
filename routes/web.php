@@ -10,7 +10,6 @@ use App\Http\Controllers\Admin\ProductCrudController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 // Controladores de la Tienda
-use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\PaymentController;
 // Adicionales
@@ -24,20 +23,22 @@ use App\Models\Categoria;
 |--------------------------------------------------------------------------
 */
 
+// ANTES:
+// Route::get('/', [WelcomeController::class, 'index'])->name('home');
+
+// AHORA:
 Route::get('/', function () {
-    $productos = Producto::all();
-    $categorias = Categoria::all();
     return Inertia::render('welcome', [
-        'productos' => $productos,
-        'categorias' => $categorias,
+        'productos' => Producto::where('is_active', true)->get(),
+        'categorias' => Categoria::all(),
     ]);
 })->name('home');
 
-Route::get('/carrito', [CartController::class, 'index'])->name('cart.index');
-Route::post('/carrito/agregar', [CartController::class, 'add'])->name('cart.add');
-Route::post('/carrito/aumentar', [CartController::class, 'increase'])->name('cart.increase');
-Route::post('/carrito/reducir', [CartController::class, 'decrease'])->name('cart.decrease');
-Route::post('/carrito/eliminar', [CartController::class, 'remove'])->name('cart.remove');
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update'); // Asumiendo que tienes un método update
+Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
+Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 
 
 /*

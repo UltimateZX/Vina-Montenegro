@@ -3,41 +3,57 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\LoginRequest;
+use App\Models\Usuario;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-use Inertia\Response;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class AuthenticatedSessionController extends Controller
 {
     /**
-     * Display the login view.
+     * Muestra la vista de login (no se usa si es un modal, pero es bueno tenerla).
      */
-    public function create(): Response
+    public function create()
     {
-        return Inertia::render('auth/login', [
-            'canResetPassword' => Route::has('password.request'),
-            'status' => session('status'),
-        ]);
+        return redirect()->route('home');
     }
 
     /**
-     * Handle an incoming authentication request.
+     * Maneja una petición de autenticación entrante.
+     *
+     * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
-        $request->authenticate();
+        // 1. Validamos los datos manualmente
+        $request->validate([
+            'email' => 'required|string|email',
+            'password' => 'required|string',
+        ]);
 
+        // 2. Intentamos autenticar al usuario
+        $user = Usuario::where('email', $request->email)->first();
+
+        if (! $user || ! Hash::check($request->password, $user->password)) {
+            throw ValidationException::withMessages([
+                'email' => __('auth.failed'),
+            ]);
+        }
+
+        // 3. Si todo es correcto, iniciamos sesión
+        Auth::login($user, $request->boolean('remember'));
+
+        // 4. Regeneramos la sesión por seguridad
         $request->session()->regenerate();
 
-        return redirect()->intended(route('home', absolute: false));
+        // 5. Redirigimos a la página de inicio (Inertia se encargará del resto)
+        return redirect()->route('home');
     }
 
     /**
-     * Destroy an authenticated session.
+     * Destruye una sesión autenticada.
      */
     public function destroy(Request $request): RedirectResponse
     {
